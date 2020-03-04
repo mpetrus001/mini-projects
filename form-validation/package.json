@@ -1,0 +1,15 @@
+{
+	"name": "form-validation",
+	"version": "1.0.0",
+	"description": "A test of form validation ",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "parcel index.html"
+	},
+	"author": "Matthew Petrus",
+	"license": "MIT",
+	"dependencies": {
+		"parcel-bundler": "^1.12.4"
+	}
+}

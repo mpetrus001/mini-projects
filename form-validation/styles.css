@@ -1,0 +1,39 @@
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+	background-color: lightgray;
+	font-family: sans-serif;
+}
+
+.container {
+	background-color: white;
+	border-radius: 10px;
+	box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+	width: 400px;
+}
+
+form {
+	padding: 20px 15px;
+}
+
+form .form-group {
+	display: grid;
+	margin-bottom: 15px;
+}
+
+form input {
+	padding: 10px;
+	color: darkslategrey;
+}
+
+form button {
+	width: 100%;
+	font-size: larger;
+	font-weight: bold;
+	background-color: lightsteelblue;
+	color: white;
+	border: none;
+	padding: 10px 0;
+}
