@@ -1,72 +1,66 @@
-// usea singelton to prevent stacking of setTimeout calls
-const emailValidationTimeout = singletonTimeout(500);
-const emailFeedbackTimeout = singletonTimeout(3000);
-const passwordValidationTimeout = singletonTimeout(500);
-const passwordFeedbackTimeout = singletonTimeout(3000);
-const password2ValidationTimeout = singletonTimeout(500);
-const password2FeedbackTimeout = singletonTimeout(3000);
+class InputValidator {
+	constructor(selector) {
+		this.resetTimeout = singletonTimeout(500);
+		this.inputEl = document.querySelector(selector);
+		this.feedbackHandler = new FeedbackHandler(
+			document.querySelector(selector).parentElement.querySelector('.feedback')
+		);
+	}
+	check(checkFn, errMsg) {
+		this.resetTimeout(() => {
+			if (checkFn(this.inputEl.value)) {
+				this.feedbackHandler.ok('Checks out. ✔');
+			} else {
+				this.feedbackHandler.fail(errMsg);
+			}
+			maybeToggleSubmit();
+		});
+	}
+}
+
+class FeedbackHandler {
+	constructor(feedbackEl) {
+		this.feedbackEl = feedbackEl;
+		this.resetTimeout = singletonTimeout(3000);
+	}
+	ok(successMsg) {
+		this.feedbackEl.classList.remove('error');
+		this.feedbackEl.classList.add('success');
+		this.feedbackEl.innerText = successMsg;
+	}
+	fail(errMsg) {
+		this.feedbackEl.classList.remove('success');
+		this.feedbackEl.classList.add('error');
+		this.feedbackEl.innerText = errMsg;
+		this.resetTimeout(() => {
+			this.feedbackEl.classList.remove('error');
+		});
+	}
+}
+
+const EmailValidator = new InputValidator('[data-email-input]');
+const PasswordValidator = new InputValidator('[data-password-input]');
+const Password2Validator = new InputValidator('[data-password2-input]');
 
 document.querySelector('[data-email-input]').addEventListener('input', e => {
 	if (e.target instanceof HTMLInputElement) {
-		const testValue = e.target.value;
-		const feedbackEl = e.target.parentElement.querySelector('.feedback');
-		emailValidationTimeout(() => {
-			validEmail(testValue)
-				? flashValidationFeedback('success', feedbackEl, emailFeedbackTimeout)
-				: flashValidationFeedback(
-						'error',
-						feedbackEl,
-						emailFeedbackTimeout,
-						'Format seems off. 👎'
-				  );
-			toggleSubmit();
-		});
+		EmailValidator.check(validEmail, 'Format seems off. 👎');
 	}
 });
 document.querySelector('[data-password-input]').addEventListener('input', e => {
 	if (e.target instanceof HTMLInputElement) {
-		const testValue = e.target.value;
-		const feedbackEl = e.target.parentElement.querySelector('.feedback');
-		passwordValidationTimeout(() => {
-			validPassword(testValue)
-				? flashValidationFeedback(
-						'success',
-						feedbackEl,
-						passwordFeedbackTimeout
-				  )
-				: flashValidationFeedback(
-						'error',
-						feedbackEl,
-						passwordFeedbackTimeout,
-						'Make it longer. 🎢'
-				  );
-			toggleSubmit();
-		});
+		PasswordValidator.check(validPassword, 'Make it longer. 🎢');
 	}
 });
 document
 	.querySelector('[data-password2-input]')
 	.addEventListener('input', e => {
 		if (e.target instanceof HTMLInputElement) {
-			const testValue = e.target.value;
-			// @ts-ignore
-			const testValue2 = document.querySelector('[data-password-input]').value;
-			const feedbackEl = e.target.parentElement.querySelector('.feedback');
-			password2ValidationTimeout(() => {
-				testValue === testValue2
-					? flashValidationFeedback(
-							'success',
-							feedbackEl,
-							password2FeedbackTimeout
-					  )
-					: flashValidationFeedback(
-							'error',
-							feedbackEl,
-							password2FeedbackTimeout,
-							'Make it match. 🧦'
-					  );
-				toggleSubmit();
-			});
+			Password2Validator.check(
+				// @ts-ignore
+				validPassword2(document.querySelector('[data-password-input]').value),
+				'Make it match. 🧦'
+			);
 		}
 	});
 
@@ -76,6 +70,9 @@ function validEmail(email) {
 }
 function validPassword(password) {
 	return password.length >= 6;
+}
+function validPassword2(password1) {
+	return password2 => password1 === password2;
 }
 function singletonTimeout(length) {
 	let timeoutID = undefined;
@@ -90,33 +87,10 @@ function singletonTimeout(length) {
 	}
 	return resetTimeout;
 }
-function toggleSubmit() {
+function maybeToggleSubmit() {
 	if (document.querySelectorAll('.success').length == 3) {
 		document.querySelector('form button').removeAttribute('disabled');
 	} else if (document.querySelectorAll('.success').length !== 3) {
 		document.querySelector('form button').setAttribute('disabled', 'true');
-	}
-}
-
-function flashValidationFeedback(
-	result,
-	feedbackElement,
-	feedbackTimeout,
-	errMsg
-) {
-	if (result == 'success') {
-		feedbackElement.classList.remove('error');
-		feedbackElement.classList.add('success');
-		feedbackElement.innerText = 'Checks out. ✔';
-		return null;
-	}
-	if (result == 'error') {
-		feedbackElement.classList.remove('success');
-		feedbackElement.classList.add('error');
-		feedbackElement.innerText = errMsg;
-		feedbackTimeout(() => {
-			feedbackElement.classList.remove('error');
-		});
-		return null;
 	}
 }
