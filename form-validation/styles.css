@@ -3,7 +3,7 @@ body {
 	justify-content: center;
 	align-items: center;
 	min-height: 100vh;
-	background-color: lightgray;
+	background-color: #ecf0f1;
 	font-family: sans-serif;
 }
 
@@ -20,20 +20,48 @@ form {
 
 form .form-group {
 	display: grid;
-	margin-bottom: 15px;
+	margin-bottom: 10px;
 }
 
 form input {
 	padding: 10px;
-	color: darkslategrey;
+	border: none;
+	border-bottom: 1px solid black;
+	margin-bottom: 3px;
+}
+
+form .feedback {
+	padding: 5px;
+	color: white;
+	font-size: small;
+	border-radius: 5px;
+	visibility: hidden;
+}
+form .error {
+	background-color: rgba(225, 112, 85, 0.8);
+	visibility: visible;
+}
+form .success {
+	background-color: rgba(0, 184, 148, 0.8);
+	visibility: visible;
+}
+form [disabled] {
+	background-color: rgba(250, 177, 160, 1);
+}
+form [disabled]:hover {
+	background-color: rgba(250, 177, 160, 1);
 }
 
 form button {
 	width: 100%;
 	font-size: larger;
 	font-weight: bold;
-	background-color: lightsteelblue;
+	background-color: rgba(0, 184, 148, 1);
 	color: white;
 	border: none;
 	padding: 10px 0;
+	border-radius: 5px;
+}
+form button:hover {
+	background-color: rgba(0, 184, 148, 0.8);
 }

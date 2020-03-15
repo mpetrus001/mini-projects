@@ -3,17 +3,13 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="./reset.css" />
 		<link rel="stylesheet" href="./styles.css" />
 		<title>DEV_Mini Form-Validation</title>
 	</head>
 	<body>
 		<div class="container">
-			<form action="">
-				<div class="form-group">
-					<label for="name">Username:</label>
-					<input type="text" name="name" id="name" placeholder="enter name" />
-					<div class="feedback">feedback text</div>
-				</div>
+			<form data-test-form>
 				<div class="form-group">
 					<label for="email">Email Address:</label>
 					<input
@@ -21,6 +17,8 @@
 						name="email"
 						id="email"
 						placeholder="enter email"
+						autocomplete="off"
+						data-email-input
 					/>
 					<div class="feedback">feedback text</div>
 				</div>
@@ -31,6 +29,8 @@
 						name="password"
 						id="password"
 						placeholder="enter password"
+						autocomplete="off"
+						data-password-input
 					/>
 					<div class="feedback">feedback text</div>
 				</div>
@@ -38,13 +38,15 @@
 					<label for="password-2">Confirm Password:</label>
 					<input
 						type="password"
-						name="password-2"
-						id="password-2"
+						name="password2"
+						id="password2"
 						placeholder="re-enter password"
+						autocomplete="off"
+						data-password2-input
 					/>
 					<div class="feedback">feedback text</div>
 				</div>
-				<button>Submit</button>
+				<button disabled>Submit</button>
 			</form>
 		</div>
 		<script src="./script.js"></script>
