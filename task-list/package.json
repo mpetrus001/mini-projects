@@ -8,5 +8,6 @@
 	},
 	"keywords": [],
 	"author": "Matthew P",
-	"license": "MIT"
+	"license": "MIT",
+	"devDependencies": {}
 }
