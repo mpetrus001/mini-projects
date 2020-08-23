@@ -25,6 +25,7 @@ function ListForm(persist) {
       "submit",
       handelEditSubmit(selectedItem.createdOn)
     );
+    addDeleteButton(selectedItem.createdOn);
   } else {
     listForm.addEventListener("submit", handelAddSubmit);
   }
@@ -54,8 +55,23 @@ function ListForm(persist) {
     if (formData.get("title") && formData.get("title").length > 0) {
       persist.addOne({ title: formData.get("title") });
       location.replace("/public/index.html");
+      return;
     }
     console.error("title must have length greater than 0");
+  }
+
+  function addDeleteButton(id) {
+    let newButton = document.createElement("button");
+    newButton.innerText = "Delete";
+    let listForm = document.querySelector(formSelector);
+    if (listForm == null || listForm.tagName.toLowerCase() !== "form")
+      throw new Error("could not find list form element");
+    listForm.appendChild(newButton);
+    newButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      persist.deleteOne(id);
+      location.replace("/public/index.html");
+    });
   }
 
   function handleCancel(event) {
