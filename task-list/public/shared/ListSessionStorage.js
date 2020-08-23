@@ -18,9 +18,26 @@ function ListSessionStorage(STORAGE_KEY) {
     return [];
   }
 
+  function getOneById(id) {
+    let rawList = sessionStorage.getItem(STORAGE_KEY);
+    if (rawList == null) {
+      console.error("could not find list in session storage");
+      return {};
+    }
+    let parsedList = JSON.parse(rawList);
+    if (Array.isArray(parsedList)) {
+      let selectedItem = parsedList.find((item) => item.createdOn == id);
+      if (selectedItem) return selectedItem;
+      console.error("matching item could not be found in list");
+      return {};
+    }
+    console.error("string retrieved from storage did not parse to array");
+    return {};
+  }
+
   function addOne(props) {
     let newItem = {
-      createdOn: new Date(),
+      createdOn: Date.now(),
       ...props,
     };
     let rawList = sessionStorage.getItem(STORAGE_KEY);
@@ -37,9 +54,35 @@ function ListSessionStorage(STORAGE_KEY) {
     console.error("string retrieved from persist did not parse to array");
   }
 
+  function updateOne(id, props) {
+    let rawList = sessionStorage.getItem(STORAGE_KEY);
+    if (rawList == null) {
+      return console.error("could not find list in session storage");
+    }
+    let parsedList = JSON.parse(rawList);
+    if (Array.isArray(parsedList)) {
+      console.log(id);
+      let selectedItem = parsedList.find((item) => item.createdOn == id);
+      if (selectedItem) {
+        let newItem = Object.assign(selectedItem, props);
+        let filteredList = parsedList.filter((item) => item.createdOn !== id);
+        return sessionStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify([...filteredList, newItem])
+        );
+      }
+      return console.error("matching item could not be found in list");
+    }
+    return console.error(
+      "string retrieved from storage did not parse to array"
+    );
+  }
+
   return {
     getAll,
+    getOneById,
     addOne,
+    updateOne,
   };
 }
 

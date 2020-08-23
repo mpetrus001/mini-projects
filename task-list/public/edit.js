@@ -5,20 +5,57 @@ function ListForm(persist) {
   let listForm = document.querySelector(formSelector);
   if (listForm == null || listForm.tagName.toLowerCase() !== "form")
     throw new Error("could not find list form element");
-  listForm.addEventListener("submit", handelSubmit);
   listForm.addEventListener("reset", handleCancel);
 
-  function handelSubmit(event) {
+  if (location.search) {
+    let urlParams = new URLSearchParams(location.search);
+    let selectedItem = persist.getOneById(urlParams.get("id"));
+    if (selectedItem.title) {
+      let itemTitleInput = document.querySelector(
+        `${formSelector} input[name]`
+      );
+      if (
+        itemTitleInput == null ||
+        itemTitleInput.tagName.toLowerCase() !== "input"
+      )
+        throw new Error("could not find title input element");
+      itemTitleInput.value = selectedItem.title;
+    }
+    listForm.addEventListener(
+      "submit",
+      handelEditSubmit(selectedItem.createdOn)
+    );
+  } else {
+    listForm.addEventListener("submit", handelAddSubmit);
+  }
+
+  function handelEditSubmit(id) {
+    return (event) => {
+      event.preventDefault();
+      let listForm = document.querySelector(formSelector);
+      if (listForm == null || listForm.tagName.toLowerCase() !== "form")
+        throw new Error("could not find list form element");
+      let formData = new FormData(listForm);
+      if (formData.get("title") && formData.get("title").length > 0) {
+        persist.updateOne(id, { title: formData.get("title") });
+        location.replace("/public/index.html");
+        return;
+      }
+      console.error("title must have length greater than 0");
+    };
+  }
+
+  function handelAddSubmit(event) {
     event.preventDefault();
     let listForm = document.querySelector(formSelector);
     if (listForm == null || listForm.tagName.toLowerCase() !== "form")
       throw new Error("could not find list form element");
     let formData = new FormData(listForm);
-    console.log(formData);
     if (formData.get("title") && formData.get("title").length > 0) {
       persist.addOne({ title: formData.get("title") });
       location.replace("/public/index.html");
     }
+    console.error("title must have length greater than 0");
   }
 
   function handleCancel(event) {
