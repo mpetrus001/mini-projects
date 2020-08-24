@@ -30,24 +30,38 @@ function ListView(persist) {
     if (currentList.length < 1) {
       let newLi = document.createElement("li");
       let newDiv = document.createElement("div");
-      newDiv.innerText = "Add some books!";
+      newDiv.innerText = "Add some items!";
       newLi.appendChild(newDiv);
       listUl.appendChild(newLi);
       return;
     }
     for (let item of currentList) {
-      let newLi = document.createElement("li");
-      newLi.setAttribute("id", item.createdOn ? item.createdOn : "");
+      let newLiWithPropDivs = [addTitleDiv, addCreatedOnDiv].reduce(
+        (returnLi, addDiv) => addDiv(returnLi, item),
+        document.createElement("li")
+      );
+      newLiWithPropDivs.setAttribute(
+        "id",
+        item.createdOn ? item.createdOn : ""
+      );
+      listUl.appendChild(newLiWithPropDivs);
+    }
+
+    function addTitleDiv(liElement, item) {
       let titleDiv = document.createElement("div");
       titleDiv.innerText = item.title ? item.title : "#";
-      newLi.appendChild(titleDiv);
+      liElement.appendChild(titleDiv);
+      return liElement;
+    }
+
+    function addCreatedOnDiv(liElement, item) {
       let dateDiv = document.createElement("div");
       let createdOn = item.createdOn
         ? new Date(item.createdOn)
         : { toLocaleDateString: () => "#" };
       dateDiv.innerText = createdOn.toLocaleDateString();
-      newLi.appendChild(dateDiv);
-      listUl.appendChild(newLi);
+      liElement.appendChild(dateDiv);
+      return liElement;
     }
   }
 }
