@@ -22,7 +22,7 @@
             <p class="panel__subheading">
               Already have an account? <a href="$">Sign in</a>
             </p>
-            <form action="" onsubmit="alert('success')">
+            <form id="registrationForm">
               <div class="input">
                 <label for="emailAddress">Email Address</label>
                 <input
@@ -41,11 +41,12 @@
               </div>
               <div class="password">
                 <div class="input">
-                  <label for="newPassword">Password</label>
+                  <label for="newPassword1">Password</label>
                   <input
                     type="password"
-                    name="newPassword"
-                    id="newPassword"
+                    name="newPassword1"
+                    id="newPassword1"
+                    minlength="8"
                     required
                   />
                   <div class="input__indicator"></div>
@@ -81,6 +82,7 @@
                       id="dayNumber"
                       min="1"
                       max="31"
+                      value="1"
                     />
                     <div class="input__indicator"></div>
                   </div>
@@ -92,6 +94,7 @@
                       id="yearNumber"
                       min="1900"
                       max="2020"
+                      value="2002"
                     />
                     <div class="input__indicator"></div>
                   </div>
@@ -108,5 +111,6 @@
         </div>
       </div>
     </div>
+    <script src="./script.js"></script>
   </body>
 </html>
