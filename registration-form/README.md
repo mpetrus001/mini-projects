@@ -2,4 +2,4 @@
 
 Followed along with [@thunghiemdinh](https://twitter.com/thunghiemdinh) in this [video](https://www.youtube.com/watch?v=XXDOUuzzUOY&list=WL&index=5).
 
-![Screenshot](screenshot.png)
+![Screenshot](screenshot.jpg)
