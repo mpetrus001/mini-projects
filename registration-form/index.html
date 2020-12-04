@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="./favicon.ico" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Register</title>
+  </head>
+  <body>
+    <div class="background-overlay">
+      <div id="container">
+        <div class="logo-container">
+          <div class="logo">
+            <img src="./logo.png" alt="camping logo" width="90" height="90" />
+            <p class="logo-text">Go camping>></p>
+          </div>
+        </div>
+        <div class="panel-container">
+          <div class="panel">
+            <h1 class="panel__heading">Create an account</h1>
+            <p class="panel__subheading">
+              Already have an account? <a href="$">Sign in</a>
+            </p>
+            <form action="" onsubmit="alert('success')">
+              <div class="input">
+                <label for="emailAddress">Email Address</label>
+                <input
+                  type="email"
+                  name="emailAddress"
+                  id="emailAddress"
+                  required
+                />
+                <div class="input__indicator"></div>
+              </div>
+
+              <div class="input">
+                <label for="firstName">Name</label>
+                <input type="text" name="firstName" id="firstName" />
+                <div class="input__indicator"></div>
+              </div>
+              <div class="password">
+                <div class="input">
+                  <label for="newPassword">Password</label>
+                  <input
+                    type="password"
+                    name="newPassword"
+                    id="newPassword"
+                    required
+                  />
+                  <div class="input__indicator"></div>
+                </div>
+                <div class="input">
+                  <label for="newPassword2">Re-Enter Password</label>
+                  <input
+                    type="password"
+                    name="newPassword2"
+                    id="newPassword2"
+                    required
+                  />
+                  <div class="input__indicator"></div>
+                </div>
+              </div>
+              <div class="date-of-birth">
+                <h6 class="date-of-birth__heading">Date of Birth</h6>
+                <div class="date-of-birth__inputs">
+                  <div class="dropdown">
+                    <label for="monthSelection">Month</label>
+                    <select name="monthSelection" id="monthSelection">
+                      <option value="jan">1-January</option>
+                      <option value="feb">2-February</option>
+                      <option value="mar">3-March</option>
+                      <option value="apr">4-April</option>
+                    </select>
+                  </div>
+                  <div class="input">
+                    <label for="dayNumber">Day</label>
+                    <input
+                      type="number"
+                      name="dayNumber"
+                      id="dayNumber"
+                      min="1"
+                      max="31"
+                    />
+                    <div class="input__indicator"></div>
+                  </div>
+                  <div class="input">
+                    <label for="yearNumber">Year</label>
+                    <input
+                      type="number"
+                      name="yearNumber"
+                      id="yearNumber"
+                      min="1900"
+                      max="2020"
+                    />
+                    <div class="input__indicator"></div>
+                  </div>
+                </div>
+              </div>
+              <p class="content">
+                By clicking Create Account, I agree that I have read the
+                <a href="#">Terms of Use</a> and <a href="#">Privacy Policy.</a>
+              </p>
+
+              <button type="submit">Create Account</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
