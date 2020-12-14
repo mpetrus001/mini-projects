@@ -27,11 +27,14 @@ canvas.addEventListener("mouseup", () => {
 });
 
 // Player
-
+const playerLeftImage = new Image();
+playerLeftImage.src = "./sprites/__cartoon_fish_06_red_swim_left.png";
+const playerRightImage = new Image();
+playerRightImage.src = "./sprites/__cartoon_fish_06_red_swim_right.png";
 class Player {
   MOVE_STEP = 20;
   constructor() {
-    this.x = canvas.width / 2;
+    this.x = canvas.width;
     this.y = canvas.height / 2;
     this.radius = 50;
     this.angle = 0;
@@ -48,6 +51,7 @@ class Player {
   update() {
     const dx = this.x - mouse.x;
     const dy = this.y - mouse.y;
+    this.angle = Math.atan2(dy, dx);
     if (mouse.x != this.x) {
       this.x -= dx / this.MOVE_STEP;
     }
@@ -68,23 +72,57 @@ class Player {
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     ctx.fill();
     ctx.closePath();
+    ctx.fillRect(this.x, this.y, this.radius, 10);
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.angle);
+    if (this.x >= mouse.x) {
+      ctx.drawImage(
+        playerLeftImage,
+        this.frameX * this.spriteWidth,
+        this.frameY * this.spriteHeight,
+        this.spriteWidth,
+        this.spriteHeight,
+        0 - 60,
+        0 - 45,
+        this.spriteWidth / 4,
+        this.spriteHeight / 4
+      );
+    } else {
+      ctx.drawImage(
+        playerRightImage,
+        this.frameX * this.spriteWidth,
+        this.frameY * this.spriteHeight,
+        this.spriteWidth,
+        this.spriteHeight,
+        0 - 60,
+        0 - 45,
+        this.spriteWidth / 4,
+        this.spriteHeight / 4
+      );
+    }
+    ctx.restore();
   }
 }
 
 const player = new Player();
-// Bubbles
 
-const bubblesArray = [];
+// Bubbles
+let bubblesArray = [];
 class Bubble {
   constructor() {
     this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
+    this.y = canvas.height + canvas.height + 100;
     this.radius = 50;
     this.speed = Math.random() * 5 + 1;
-    this.distance;
+    this.popped = false;
   }
   update() {
     this.y -= this.speed;
+    let dx = this.x - player.x;
+    let dy = this.y - player.y;
+    let distance = Math.sqrt(dx * dx + dy * dy);
+    this.popped = distance < this.radius + player.radius;
   }
   draw() {
     ctx.fillStyle = "blue";
@@ -95,14 +133,38 @@ class Bubble {
     ctx.stroke();
   }
 }
+
+const pop1Audio = document.createElement("audio");
+pop1Audio.src = "./sounds/pop1.ogg";
+const pop2Audio = document.createElement("audio");
+pop2Audio.src = "./sounds/pop2.ogg";
+const pop3Audio = document.createElement("audio");
+pop3Audio.src = "./sounds/pop3.ogg";
+
 function handleBubbles() {
   if (gameFrame % 50 == 0) {
-    bubblesArray.push(new Bubble());
+    bubblesArray = bubblesArray.concat(new Bubble());
   }
   for (let bubble of bubblesArray) {
     bubble.update();
     bubble.draw();
   }
+  // remove bubbles that have left canvas
+  bubblesArray = bubblesArray.filter((bubble) => {
+    if (bubble.popped) {
+      Math.random() <= 0.5
+        ? pop1Audio.play()
+        : Math.random() <= 0.5
+        ? pop2Audio.play()
+        : pop3Audio.play();
+      score++;
+      return false;
+    }
+    if (bubble.y < 0 - 100) {
+      return false;
+    }
+    return true;
+  });
 }
 
 // Animation loop
@@ -112,8 +174,15 @@ function animate() {
   handleBubbles();
   player.update();
   player.draw();
+  ctx.fillStyle = "black";
+  ctx.fillText(`Score: ${score}`, 10, 50);
   gameFrame++;
   requestAnimationFrame(animate);
 }
 
 animate();
+
+window.addEventListener(
+  "resize",
+  () => (canvasPosition = canvas.getBoundingClientRect())
+);
