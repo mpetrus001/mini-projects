@@ -1,19 +1,21 @@
 // Canvas setup
-
 const canvas = document.getElementById("canvas1");
-const ctx = canvas.getContext("2d");
 canvas.width = 800;
 canvas.height = 500;
+const ctx = canvas.getContext("2d");
+ctx.font = "30px Georgia";
 
 let score = 0;
-let gameFrame = 0;
-ctx.font = "30px Georgia";
-let gameSpeed = 1;
 let gameOver = false;
+let gameFrame = 0;
 
 // Mouse interactivity
-
 let canvasPosition = canvas.getBoundingClientRect();
+window.addEventListener(
+  "resize",
+  () => (canvasPosition = canvas.getBoundingClientRect())
+);
+
 const mouse = {
   x: canvas.width / 2,
   y: canvas.height / 2,
@@ -38,6 +40,7 @@ class Player {
   constructor() {
     this.x = canvas.width;
     this.y = canvas.height / 2;
+    // radius of hitbox
     this.radius = 40;
     this.angle = 0;
     // coordinates of the frame in the sprite sheet
@@ -53,7 +56,7 @@ class Player {
   update() {
     const dx = this.x - mouse.x;
     const dy = this.y - mouse.y;
-    // change angle to match direction to mouse
+    // change angle to match direction of mouse click
     this.angle = Math.atan2(dy, dx);
 
     if (mouse.x != this.x) {
@@ -85,40 +88,35 @@ class Player {
       ctx.lineTo(mouse.x, mouse.y);
       ctx.stroke();
     }
+    // circle for collision debug
     // ctx.fillStyle = "red";
     // ctx.beginPath();
     // ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     // ctx.fill();
     // ctx.closePath();
     // ctx.fillRect(this.x, this.y, this.radius, 10);
+    const drawPlayer = (image) => {
+      ctx.drawImage(
+        image,
+        this.frameX * this.spriteWidth,
+        this.frameY * this.spriteHeight,
+        this.spriteWidth,
+        this.spriteHeight,
+        0 - 60,
+        0 - 45,
+        this.spriteWidth / 4,
+        this.spriteHeight / 4
+      );
+    };
+    // stash the current state then rotate the player
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.angle);
     // flip the image if going the other way
     if (this.x >= mouse.x) {
-      ctx.drawImage(
-        playerLeftImage,
-        this.frameX * this.spriteWidth,
-        this.frameY * this.spriteHeight,
-        this.spriteWidth,
-        this.spriteHeight,
-        0 - 60,
-        0 - 45,
-        this.spriteWidth / 4,
-        this.spriteHeight / 4
-      );
+      drawPlayer(playerLeftImage);
     } else {
-      ctx.drawImage(
-        playerRightImage,
-        this.frameX * this.spriteWidth,
-        this.frameY * this.spriteHeight,
-        this.spriteWidth,
-        this.spriteHeight,
-        0 - 60,
-        0 - 45,
-        this.spriteWidth / 4,
-        this.spriteHeight / 4
-      );
+      drawPlayer(playerRightImage);
     }
     ctx.restore();
   }
@@ -126,9 +124,16 @@ class Player {
 
 const player = new Player();
 
+function handlePlayer() {
+  player.update();
+  player.draw();
+}
+
 // Bubbles
 const bubbleImage1 = new Image();
-bubbleImage1.src = "./sprites/bubbles/bubble_pop_one_spritesheet.png";
+bubbleImage1.src = "./sprites/bubbles/bubble_pop_1_spritesheet.png";
+const bubbleImage2 = new Image();
+bubbleImage2.src = "./sprites/bubbles/bubble_pop_2_spritesheet.png";
 let bubblesArray = [];
 class Bubble {
   constructor() {
@@ -137,22 +142,33 @@ class Bubble {
     this.radius = 50;
     this.speed = Math.random() * 5 + 1;
     this.popped = false;
-    // coordinates of the frame in the sprite sheet
+    this.counted = false;
+    this.finished = false;
     this.frameX = 0;
     this.frameY = 0;
-    // number of frames on sprite sheet
     this.frame = 0;
-    // width of sprite sheet divided by number of columns
-    this.spriteWidth = 512;
-    // height of sprite sheet divided by number of columns
-    this.spriteHeight = 512;
+    this.imageChoice = Math.random() < 0.5 ? 1 : 2;
   }
   update() {
-    this.y -= this.speed;
-    let dx = this.x - player.x;
-    let dy = this.y - player.y;
-    let distance = Math.sqrt(dx * dx + dy * dy);
-    this.popped = distance < this.radius + player.radius;
+    if (this.popped) {
+      if (gameFrame % 5 == 0) {
+        this.frame++;
+        if (this.frame == 4) {
+          this.frameX = 0;
+        } else {
+          this.frameX++;
+        }
+        if (this.frame < 4) this.frameY = 0;
+        else if (this.frame < 8) this.frameY = 1;
+        if (this.frame >= 8) this.finished = true;
+      }
+    } else {
+      this.y -= this.speed;
+      let dx = this.x - player.x;
+      let dy = this.y - player.y;
+      let distance = Math.sqrt(dx * dx + dy * dy);
+      this.popped = distance < this.radius + player.radius;
+    }
   }
   draw() {
     // ctx.fillStyle = "blue";
@@ -161,46 +177,72 @@ class Bubble {
     // ctx.fill();
     // ctx.closePath();
     // ctx.stroke();
-    ctx.drawImage(
-      bubbleImage1,
-      this.frameX * this.spriteWidth,
-      this.frameY * this.spriteHeight,
-      this.spriteWidth,
-      this.spriteHeight,
-      this.x - 66,
-      this.y - 65,
-      this.spriteWidth / 3.9,
-      this.spriteHeight / 3.9
-    );
+    const drawBubble = (image) => {
+      let bubbleImage = bubbleImage1;
+      let spriteWidth = 512;
+      let spriteHeight = 512;
+      if (image > 1) {
+        bubbleImage = bubbleImage2;
+        spriteWidth = 393.75;
+        spriteHeight = 511.5;
+      }
+      ctx.drawImage(
+        bubbleImage,
+        this.frameX * spriteWidth,
+        this.frameY * spriteHeight,
+        spriteWidth,
+        spriteHeight,
+        this.x - 66,
+        this.y - 65,
+        spriteWidth / 3.9,
+        spriteHeight / 3.9
+      );
+    };
+    drawBubble(this.imageChoice);
   }
 }
 
-const pop1Audio = document.createElement("audio");
-pop1Audio.src = "./sounds/pop1.ogg";
-const pop2Audio = document.createElement("audio");
-pop2Audio.src = "./sounds/pop2.ogg";
-const pop3Audio = document.createElement("audio");
-pop3Audio.src = "./sounds/pop3.ogg";
+const pop1Audio = new Audio("./sounds/pop1.ogg");
+const pop2Audio = new Audio("./sounds/pop2.ogg");
+const pop3Audio = new Audio("./sounds/pop3.ogg");
 
 function handleBubbles() {
   if (gameFrame % 10 == 0) {
     bubblesArray = bubblesArray.concat(new Bubble());
   }
+  function playRandomBubbleSound() {
+    let choice = ~~(Math.random() * 3) + 1;
+    let audio = pop1Audio.cloneNode();
+    switch (choice) {
+      case 1:
+        audio = pop1Audio.cloneNode();
+        break;
+      case 2:
+        audio = pop2Audio.cloneNode();
+        break;
+      case 3:
+        audio = pop3Audio.cloneNode();
+        break;
+      default:
+        break;
+    }
+    audio.play();
+  }
   for (let bubble of bubblesArray) {
     bubble.update();
     bubble.draw();
-  }
-  // remove bubbles that have left canvas or were popped
-  bubblesArray = bubblesArray.filter((bubble) => {
-    if (bubble.popped) {
-      Math.random() <= 0.5
-        ? pop1Audio.play()
-        : Math.random() <= 0.5
-        ? pop2Audio.play()
-        : pop3Audio.play();
+    if (bubble.popped && !bubble.counted) {
       score++;
+      playRandomBubbleSound();
+      bubble.counted = true;
+    }
+  }
+  bubblesArray = bubblesArray.filter((bubble) => {
+    // remove bubbles that were popped and finished animating
+    if (bubble.popped && bubble.finished) {
       return false;
     }
+    // remove bubbles that have left canvas
     if (bubble.y < 0 - 100) {
       return false;
     }
@@ -286,12 +328,12 @@ function handleEnemies() {
   for (let enemy of enemiesArray) {
     enemy.update();
     enemy.draw();
-    if (enemy.touched) handleGameOver();
+    if (enemy.touched) triggerGameOver();
   }
 }
 
-function handleGameOver() {
-  ctx.fillStyle = "white";
+function triggerGameOver() {
+  ctx.fillStyle = "black";
   ctx.fillText("Game Over", 225, 225);
   ctx.fillText(`Final Score: ${score}`, 225, 265);
   gameOver = true;
@@ -324,19 +366,13 @@ function handleBackground() {
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   handleBackground();
-  player.update();
-  player.draw();
+  handlePlayer();
   handleBubbles();
-  handleEnemies();
+  // handleEnemies();
   ctx.fillStyle = "black";
-  ctx.fillText(`Score: ${score}`, 10, 50);
+  ctx.fillText(`Score: ${score}`, 10, 30);
   gameFrame++;
   if (!gameOver) requestAnimationFrame(animate);
 }
 
 animate();
-
-window.addEventListener(
-  "resize",
-  () => (canvasPosition = canvas.getBoundingClientRect())
-);
