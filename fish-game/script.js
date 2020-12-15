@@ -3,7 +3,6 @@ const canvas = document.getElementById("canvas1");
 canvas.width = 800;
 canvas.height = 500;
 const ctx = canvas.getContext("2d");
-ctx.font = "30px Georgia";
 
 let score = 0;
 let gameOver = false;
@@ -32,9 +31,9 @@ canvas.addEventListener("mouseup", () => {
 
 // Player
 const playerLeftImage = new Image();
-playerLeftImage.src = "./sprites/fish/__cartoon_fish_06_red_swim_left.png";
+playerLeftImage.src = "./sprites/fish/__red_cartoon_fish_06_swim_left.png";
 const playerRightImage = new Image();
-playerRightImage.src = "./sprites/fish/__cartoon_fish_06_red_swim_right.png";
+playerRightImage.src = "./sprites/fish/__red_cartoon_fish_06_swim_right.png";
 class Player {
   MOVE_STEP = 20;
   constructor() {
@@ -66,7 +65,7 @@ class Player {
       this.y -= dy / this.MOVE_STEP;
     }
     // cycle through sprite sheet every 5 frames
-    if (gameFrame % 5 == 0) {
+    if (gameFrame % 8 == 0) {
       this.frame++;
       if (this.frame >= 12) this.frame = 0;
       if (this.frame == 3 || this.frame == 7 || this.frame == 11) {
@@ -177,28 +176,25 @@ class Bubble {
     // ctx.fill();
     // ctx.closePath();
     // ctx.stroke();
-    const drawBubble = (image) => {
-      let bubbleImage = bubbleImage1;
-      let spriteWidth = 512;
-      let spriteHeight = 512;
-      if (image > 1) {
-        bubbleImage = bubbleImage2;
-        spriteWidth = 393.75;
-        spriteHeight = 511.5;
-      }
-      ctx.drawImage(
-        bubbleImage,
-        this.frameX * spriteWidth,
-        this.frameY * spriteHeight,
-        spriteWidth,
-        spriteHeight,
-        this.x - 66,
-        this.y - 65,
-        spriteWidth / 3.9,
-        spriteHeight / 3.9
-      );
-    };
-    drawBubble(this.imageChoice);
+    let bubbleImage = bubbleImage1;
+    let spriteWidth = 512;
+    let spriteHeight = 512;
+    if (this.imageChoice > 1) {
+      bubbleImage = bubbleImage2;
+      spriteWidth = 393.75;
+      spriteHeight = 511.5;
+    }
+    ctx.drawImage(
+      bubbleImage,
+      this.frameX * spriteWidth,
+      this.frameY * spriteHeight,
+      spriteWidth,
+      spriteHeight,
+      this.x - 66,
+      this.y - 65,
+      spriteWidth / 3.9,
+      spriteHeight / 3.9
+    );
   }
 }
 
@@ -210,30 +206,24 @@ function handleBubbles() {
   if (gameFrame % 10 == 0) {
     bubblesArray = bubblesArray.concat(new Bubble());
   }
-  function playRandomBubbleSound() {
-    let choice = ~~(Math.random() * 3) + 1;
-    let audio = pop1Audio.cloneNode();
-    switch (choice) {
-      case 1:
-        audio = pop1Audio.cloneNode();
-        break;
-      case 2:
-        audio = pop2Audio.cloneNode();
-        break;
-      case 3:
-        audio = pop3Audio.cloneNode();
-        break;
-      default:
-        break;
-    }
-    audio.play();
-  }
   for (let bubble of bubblesArray) {
     bubble.update();
     bubble.draw();
     if (bubble.popped && !bubble.counted) {
       score++;
-      playRandomBubbleSound();
+      let choice = ~~(Math.random() * 3) + 1;
+      let audio = pop1Audio.cloneNode();
+      switch (choice) {
+        case 2:
+          audio = pop2Audio.cloneNode();
+          break;
+        case 3:
+          audio = pop3Audio.cloneNode();
+          break;
+        default:
+          break;
+      }
+      audio.play();
       bubble.counted = true;
     }
   }
@@ -252,7 +242,17 @@ function handleBubbles() {
 
 // Enemies
 const enemyImage1 = new Image();
-enemyImage1.src = "./sprites/fish/__yellow_cartoon_fish_01_swim.png";
+enemyImage1.src = "./sprites/fish/__blue_cartoon_fish_01_swim.png";
+const enemyImage2 = new Image();
+enemyImage2.src = "./sprites/fish/__green_cartoon_fish_01_swim.png";
+const enemyImage3 = new Image();
+enemyImage3.src = "./sprites/fish/__orange_cartoon_fish_01_swim.png";
+const enemyImage4 = new Image();
+enemyImage4.src = "./sprites/fish/__pink_cartoon_fish_01_swim.png";
+const enemyImage5 = new Image();
+enemyImage5.src = "./sprites/fish/__red_cartoon_fish_01_swim.png";
+const enemyImage6 = new Image();
+enemyImage6.src = "./sprites/fish/__yellow_cartoon_fish_01_swim.png";
 let enemiesArray = [];
 class Enemy {
   constructor() {
@@ -262,15 +262,10 @@ class Enemy {
     this.radius = 40;
     this.touched = false;
     this.angle = 0;
-    // coordinates of the frame in the sprite sheet
     this.frameX = 0;
     this.frameY = 0;
-    // number of frames on sprite sheet
     this.frame = 0;
-    // width of sprite sheet divided by number of columns
-    this.spriteWidth = 418;
-    // height of sprite sheet divided by number of columns
-    this.spriteHeight = 397;
+    this.imageChoice = ~~(Math.random() * 6) + 1;
   }
   update() {
     this.x -= this.speed;
@@ -307,16 +302,41 @@ class Enemy {
     // ctx.fill();
     // ctx.closePath();
     // ctx.stroke();
+    let enemyImage = enemyImage1;
+    let spriteWidth = 418;
+    let spriteHeight = 397;
+    switch (this.imageChoice) {
+      case 1:
+        enemyImage = enemyImage1;
+        break;
+      case 2:
+        enemyImage = enemyImage2;
+        break;
+      case 3:
+        enemyImage = enemyImage3;
+        break;
+      case 4:
+        enemyImage = enemyImage4;
+        break;
+      case 5:
+        enemyImage = enemyImage5;
+        break;
+      case 6:
+        enemyImage = enemyImage6;
+        break;
+      default:
+        break;
+    }
     ctx.drawImage(
-      enemyImage1,
-      this.frameX * this.spriteWidth,
-      this.frameY * this.spriteHeight,
-      this.spriteWidth,
-      this.spriteHeight,
+      enemyImage,
+      this.frameX * spriteWidth,
+      this.frameY * spriteHeight,
+      spriteWidth,
+      spriteHeight,
       this.x - 50,
       this.y - 52,
-      this.spriteWidth / 4,
-      this.spriteHeight / 4
+      spriteWidth / 4,
+      spriteHeight / 4
     );
   }
 }
@@ -328,15 +348,8 @@ function handleEnemies() {
   for (let enemy of enemiesArray) {
     enemy.update();
     enemy.draw();
-    if (enemy.touched) triggerGameOver();
+    if (enemy.touched) gameOver = true;
   }
-}
-
-function triggerGameOver() {
-  ctx.fillStyle = "black";
-  ctx.fillText("Game Over", 225, 225);
-  ctx.fillText(`Final Score: ${score}`, 225, 265);
-  gameOver = true;
 }
 
 // Scrolling background
@@ -366,13 +379,25 @@ function handleBackground() {
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   handleBackground();
-  handlePlayer();
   handleBubbles();
-  // handleEnemies();
+  handlePlayer();
+  handleEnemies();
+  ctx.font = "30px Georgia";
   ctx.fillStyle = "black";
+  ctx.textAlign = "start";
   ctx.fillText(`Score: ${score}`, 10, 30);
   gameFrame++;
   if (!gameOver) requestAnimationFrame(animate);
+  if (gameOver) {
+    ctx.fillStyle = "black";
+    ctx.font = "50px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("Game Over", 387, 227);
+    ctx.fillText(`Final Score: ${score}`, 387, 277);
+    ctx.fillStyle = "yellow";
+    ctx.fillText("Game Over", 385, 225);
+    ctx.fillText(`Final Score: ${score}`, 385, 275);
+  }
 }
 
 animate();
