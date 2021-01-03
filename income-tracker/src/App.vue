@@ -1,26 +1,55 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <Header :totalIncome="state.totalIncome" />
+  <Form :state="state" @add-income="AddIncome" />
+  <IncomeList :state="state" @remove-income="RemoveIncome" />
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import { reactive, computed } from "vue";
+import Header from "./components/Header";
+import Form from "./components/Form";
+import IncomeList from "./components/IncomeList";
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  setup() {
+    const state = reactive({
+      income: [],
+      totalIncome: computed(() => {
+        if (state.income.length > 0)
+          return state.income.reduce((acc, entry) => acc + entry.value, 0.0);
+        return 0;
+      }),
+      sortedIncome: computed(() =>
+        [...state.income].sort((a, b) => b.date - a.date)
+      ),
+    });
+
+    function AddIncome(data) {
+      state.income = [...state.income, { id: Date.now(), ...data }];
+    }
+    function RemoveIncome(data) {
+      state.income = state.income.filter((income) => income.id !== data.id);
+    }
+
+    return {
+      state,
+      Header,
+      Form,
+      AddIncome,
+      IncomeList,
+      RemoveIncome,
+    };
+  },
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Fira Sans", sans-serif;
+}
+body {
+  background: #eee;
 }
 </style>
